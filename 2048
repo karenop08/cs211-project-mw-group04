@@ -1,0 +1,247 @@
+#include <iostream> //allows the program to display text
+#include <random> //Provides random number tools.
+#include <iomanip> //Helps format the game board.
+using namespace std; 
+
+// This function moves numbers together and combines matching tiles.
+bool process_line(int line[5], int& score) 
+//int linw[5] means we are working with 5 numbers in one row or column*
+//int& score means we can update the player's score inside this function*
+{
+    int original[5]; // creates an array that holds 5 numbers*
+
+    // Save the original line so we can compare it later.
+    for (int i = 0; i < 5; i++)
+    {
+        original[i] = line[i]; //copies the original numbers*
+    }
+
+    int temp[5] = {0, 0, 0, 0, 0}; //five empty spaces
+    //use these spaces to arrange the number
+    int position = 0; //tells the comp where to put the next number
+
+    // Step 1: Move all nonzero numbers together.
+    //this code removes the empty spaces between numbers
+    for (int i = 0; i < 5; i++)
+    {
+        if (line[i] != 0) 
+        {
+            temp[position] = line[i];
+            position++;
+        }
+    }
+
+    // Step 2: Combine matching numbers.
+    for (int i = 0; i < 4; i++)
+    //checks position 0 through 3
+    {
+        if (temp[i] != 0 && temp[i] == temp[i + 1])
+        {
+            temp[i] = temp[i] * 2;
+
+            // Add the new tile value to the score.
+            score += temp[i];
+
+            // Clear the tile that was combined.
+            temp[i + 1] = 0;
+
+            // Skip the newly combined tile.
+            i++;
+        }
+    }
+
+    // Step 3: Move numbers together again after merging.
+    int result[5] = {0, 0, 0, 0, 0};
+    position = 0;
+
+    for (int i = 0; i < 5; i++)
+    {
+        if (temp[i] != 0)
+        {
+            result[position] = temp[i];
+            position++;
+        }
+    }
+
+    // Check whether anything actually changed.
+    bool changed = false;
+
+    for (int i = 0; i < 5; i++)
+    {
+        line[i] = result[i];
+
+        if (original[i] != result[i])
+        {
+            changed = true;
+        }
+    }
+
+    return changed;
+}
+
+
+// MOVE LEFT
+bool move_left(int board[][5], int numrows, int& score)
+{
+    bool changed = false;
+
+    for (int r = 0; r < numrows; r++)
+    {
+        if (process_line(board[r], score))
+        {
+            changed = true;
+        }
+    }
+
+    return changed;
+}
+
+
+// MOVE RIGHT
+bool move_right(int board[][5], int numrows, int& score)
+{
+    bool changed = false;
+
+    for (int r = 0; r < numrows; r++)
+    {
+        int line[5];
+
+        // Read the row backwards.
+        for (int c = 0; c < 5; c++)
+        {
+            line[c] = board[r][4 - c];
+        }
+
+        if (process_line(line, score))
+        {
+            changed = true;
+        }
+
+        // Put the row back backwards.
+        for (int c = 0; c < 5; c++)
+        {
+            board[r][4 - c] = line[c];
+        }
+    }
+
+    return changed;
+}
+
+
+// MOVE UP
+bool move_up(int board[][5], int numrows, int& score)
+{
+    bool changed = false;
+
+    for (int c = 0; c < 5; c++)
+    {
+        int line[5];
+
+        // Read the column from top to bottom.
+        for (int r = 0; r < numrows; r++)
+        {
+            line[r] = board[r][c];
+        }
+
+        if (process_line(line, score))
+        {
+            changed = true;
+        }
+
+        // Put the column back.
+        for (int r = 0; r < numrows; r++)
+        {
+            board[r][c] = line[r];
+        }
+    }
+
+    return changed;
+}
+
+
+// MOVE DOWN
+bool move_down(int board[][5], int numrows, int& score)
+{
+    bool changed = false;
+
+    for (int c = 0; c < 5; c++)
+    {
+        int line[5];
+
+        // Read the column backwards.
+        for (int r = 0; r < numrows; r++)
+        {
+            line[r] = board[numrows - 1 - r][c];
+        }
+
+        if (process_line(line, score))
+        {
+            changed = true;
+        }
+
+        // Put the column back backwards.
+        for (int r = 0; r < numrows; r++)
+        {
+            board[numrows - 1 - r][c] = line[r];
+        }
+    }
+
+    return changed;
+}
+
+
+void print_board(int board[][5], int numrows = 5)
+{
+	cout << endl << "\t-----------------------------------------" << endl;
+
+	for (int r = 0; r < numrows; r++)
+	{
+		for (int c = 0; c < 5; c++)
+		{
+			if(board[r][c] > 0)
+				cout << "\t|" << right << setw(2) << setfill(' ') << board[r][c];
+			else
+				cout << "\t|" << right << setw(2) << setfill('0') << " ";
+
+			//cout << board[r][c] << "\t|\t";
+		}
+		cout << "\t|" << endl;
+		cout << "\t-----------------------------------------" << endl;
+	}
+
+	cout << "\t" << endl << endl;
+}
+
+
+void insert_random(int board[][5], int numrows = 5)
+{
+	int r, c;
+	//count empty
+	int empty_count = 0;
+	for (int r = 0; r < numrows; r++)
+	{
+		for (int c = 0; c < 5; c++)
+		{
+			if (board[r][c] == 0)
+				empty_count++;
+		}
+	}
+
+	if (empty_count > 0)
+	{
+		while (true)
+		{
+			//generate random location r, c
+			r = rand() % numrows;
+			c = rand() % numrows;
+			//check if empty
+			if (board[r][c] == 0)
+			{
+				//add number randomly {2,4}
+				board[r][c] = 2;
+				break;
+			}
+		}
+
+	}
+}
