@@ -4,9 +4,11 @@ CS211 Group Project: 2048 & Luhn Checker
 Group Project Plan
 
 Program 1: 2048
-Gameplay of the classic 2048 puzzle game using console application in C++17 with 5*5 game board size.
+
+Gameplay of the classic 2048 puzzle game using console application in C++ with 5*5 game board size.
 
 Program 2: Luhn Validation
+
 C++ program that verifies if a 16 digit number satisfies the Luhn algorithm checksum.
 
 Group Members
