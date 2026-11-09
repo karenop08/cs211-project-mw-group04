@@ -248,6 +248,75 @@ void insert_random(int board[][5], int numrows = 5) // this function adds a new 
 				board[r][c] = 2;
 				break; //stops the while loop because the computer successfully placed the new number
 			}
+
+
+            //start a new game with two 2's
+			void new_game(int board[][5], int numrows = 5)
+			{
+			    // this clears every space on the board.
+			    for (int r = 0; r < numrows; r++)
+			    {
+			        for (int c = 0; c < 5; c++)
+			        {
+			            board[r][c] = 0; 
+			        }
+			    }
+			
+			    // Add two starting tiles.
+			    insert_random(board, numrows); //places 2 in an empty space
+			    insert_random(board, numrows); //places 2 in an empty space
+			}			
+
+
+		//count the highest tile
+		int highest_tile(int board[][5], int numrows = 5)
+		{
+		    int highest = 0; //start by assuming the highest number is zero
+		
+		    for (int r = 0; r < numrows; r++)
+		    {
+		        for (int c = 0; c < 5; c++)
+		        {
+		            if (board[r][c] > highest) //ask whether the current number is bigger than the highest number we have found
+		            {
+		                highest = board[r][c]; //if it is bigger, save that number
+		            }
+		        }
+		    }
+		
+		    return highest; //give the highest number back to the main program
+		}
+
+
+////detect when the player reaches 2048
+			bool check_win(int board[][5], int numrows = 5)
+			{
+			    for (int r = 0; r < numrows; r++)
+			    {
+			        for (int c = 0; c < 5; c++)
+			        {
+			            if (board[r][c] >= 2048) //checks every space to see if the player reached 2048
+			            {
+			                return true; //if it finds 2048 it tells the program yes 
+			            }
+			        }
+			    }
+			
+			    return false;
+			}
+
+
+
+
+
+
+
+
+
+
+
+
+
 		}
 
 	}
