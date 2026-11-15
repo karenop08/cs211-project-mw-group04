@@ -4,7 +4,7 @@
 #include <iostream> // Allows the program to display text.
 #include <fstream>  // Allows the player to save and load progress.
 #include <iomanip>  // Helps format the game board.
-#include <cstdlib>  // Provides rand() for random numbers.
+#include <random>  // Provides rand() for random numbers.
 using namespace std;
 
 // This function moves numbers together and combines matching tiles.
