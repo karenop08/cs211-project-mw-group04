@@ -1,0 +1,418 @@
+#ifndef GAME_2048_HELPER_H
+#define GAME_2048_HELPER_H
+
+#include <iostream> // Allows the program to display text.
+#include <fstream>  // Allows the player to save and load progress.
+#include <iomanip>  // Helps format the game board.
+#include <cstdlib>  // Provides rand() for random numbers.
+using namespace std;
+
+// This function moves numbers together and combines matching tiles.
+// line[5] means we are working with five numbers in one row or column.
+// int& score means this function can update the player's score.
+bool process_line(int line[5], int& score)
+{
+    int original[5]; // Holds a copy of the original five numbers.
+
+    // Save the original line so we can compare it later.
+    for (int i = 0; i < 5; i++)
+    {
+        original[i] = line[i];
+    }
+
+    int temp[5] = {0, 0, 0, 0, 0}; // Temporary spaces for arranging numbers.
+    int position = 0; // Tells the computer where to put the next number.
+
+    // Step 1: Move all nonzero numbers together.
+    // This removes the empty spaces between numbers.
+    for (int i = 0; i < 5; i++)
+    {
+        if (line[i] != 0)
+        {
+            temp[position] = line[i];
+            position++;
+        }
+    }
+
+    // Step 2: Combine matching numbers.
+    for (int i = 0; i < 4; i++) // Checks positions 0 through 3.
+    {
+        if (temp[i] != 0 && temp[i] == temp[i + 1])
+        {
+            temp[i] = temp[i] * 2;
+            score += temp[i]; // Add the new tile value to the score.
+            temp[i + 1] = 0;  // Clear the tile that was combined.
+            i++;              // Skip the newly combined tile.
+        }
+    }
+
+    // Step 3: Move numbers together again after merging.
+    int result[5] = {0, 0, 0, 0, 0};
+    position = 0;
+
+    for (int i = 0; i < 5; i++)
+    {
+        if (temp[i] != 0)
+        {
+            result[position] = temp[i];
+            position++;
+        }
+    }
+
+    // Check whether anything actually changed.
+    bool changed = false;
+    for (int i = 0; i < 5; i++)
+    {
+        line[i] = result[i];
+        if (original[i] != result[i])
+        {
+            changed = true;
+        }
+    }
+
+    return changed;
+}
+
+// MOVE LEFT
+bool move_left(int board[][5], int numrows, int& score)
+{
+    bool changed = false;
+    for (int r = 0; r < numrows; r++)
+    {
+        if (process_line(board[r], score)) // Moves each row to the left.
+        {
+            changed = true;
+        }
+    }
+    return changed;
+}
+
+// MOVE RIGHT
+bool move_right(int board[][5], int numrows, int& score)
+{
+    bool changed = false;
+    for (int r = 0; r < numrows; r++)
+    {
+        int line[5]; // Temporary row to hold five numbers.
+
+        // Read the row backwards.
+        for (int c = 0; c < 5; c++)
+        {
+            line[c] = board[r][4 - c];
+        }
+
+        if (process_line(line, score))
+        {
+            changed = true;
+        }
+
+        // Put the row back backwards.
+        for (int c = 0; c < 5; c++)
+        {
+            board[r][4 - c] = line[c];
+        }
+    }
+    return changed;
+}
+
+// MOVE UP
+bool move_up(int board[][5], int numrows, int& score)
+{
+    bool changed = false;
+    for (int c = 0; c < 5; c++) // Checks each of the five columns.
+    {
+        int line[5]; // Temporary array to hold one column.
+
+        // Read the column from top to bottom.
+        for (int r = 0; r < numrows; r++)
+        {
+            line[r] = board[r][c];
+        }
+
+        if (process_line(line, score))
+        {
+            changed = true;
+        }
+
+        // Put the column back.
+        for (int r = 0; r < numrows; r++)
+        {
+            board[r][c] = line[r];
+        }
+    }
+    return changed;
+}
+
+// MOVE DOWN
+bool move_down(int board[][5], int numrows, int& score)
+{
+    bool changed = false;
+    for (int c = 0; c < 5; c++)
+    {
+        int line[5]; // Temporary array.
+
+        // Read the column backwards, from bottom to top.
+        for (int r = 0; r < numrows; r++)
+        {
+            line[r] = board[numrows - 1 - r][c];
+        }
+
+        if (process_line(line, score))
+        {
+            changed = true;
+        }
+
+        // Put the column back backwards.
+        for (int r = 0; r < numrows; r++)
+        {
+            board[numrows - 1 - r][c] = line[r];
+        }
+    }
+    return changed;
+}
+
+// void means this function does not return an answer.
+// Displays the game board on the screen.
+void print_board(int board[][5], int numrows = 5)
+{
+    cout << endl << "\t-----------------------------------------" << endl;
+
+    for (int r = 0; r < numrows; r++) // Looks at every row.
+    {
+        for (int c = 0; c < 5; c++) // Goes through each column.
+        {
+            if (board[r][c] > 0)
+            {
+                cout << "\t|" << right << setw(2) << setfill(' ') << board[r][c];
+            }
+            else
+            {
+                cout << "\t|  "; // Leaves an empty space blank.
+            }
+        }
+        cout << "\t|" << endl;
+        cout << "\t-----------------------------------------" << endl;
+    }
+    cout << "\t" << endl << endl;
+}
+
+// This function adds a new tile into the game.
+// It finds an empty spot and randomly places a 2 there.
+void insert_random(int board[][5], int numrows = 5)
+{
+    int empty_count = 0; // Counts empty spaces.
+
+    for (int r = 0; r < numrows; r++)
+    {
+        for (int c = 0; c < 5; c++)
+        {
+            if (board[r][c] == 0)
+            {
+                empty_count++;
+            }
+        }
+    }
+
+    // If there is at least one empty space, place a new tile.
+    if (empty_count > 0)
+    {
+        while (true)
+        {
+            int r = rand() % numrows; // Selects a random row.
+            int c = rand() % 5;       // Selects a random column.
+
+            if (board[r][c] == 0)
+            {
+                board[r][c] = 2; // Adds a 2 to the empty space.
+                break;            // Stops after successfully placing the tile.
+            }
+        }
+    }
+} // This brace closes insert_random before the next function begins.
+
+// Start a new game with two 2s and reset the score and move count.
+void new_game(int board[][5], int& score, int& moves, int numrows = 5)
+{
+    // This clears every space on the board.
+    for (int r = 0; r < numrows; r++)
+    {
+        for (int c = 0; c < 5; c++)
+        {
+            board[r][c] = 0;
+        }
+    }
+
+    score = 0;
+    moves = 0;
+
+    // Add two starting tiles.
+    insert_random(board, numrows);
+    insert_random(board, numrows);
+}
+
+// Count the highest tile on the board.
+int highest_tile(int board[][5], int numrows = 5)
+{
+    int highest = 0; // Starts by assuming the highest number is zero.
+    for (int r = 0; r < numrows; r++)
+    {
+        for (int c = 0; c < 5; c++)
+        {
+            if (board[r][c] > highest)
+            {
+                highest = board[r][c];
+            }
+        }
+    }
+    return highest;
+}
+
+// Detect when the player reaches 2048.
+bool check_win(int board[][5], int numrows = 5)
+{
+    for (int r = 0; r < numrows; r++)
+    {
+        for (int c = 0; c < 5; c++)
+        {
+            if (board[r][c] >= 2048)
+            {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+// Detect when the game is over.
+// The game is over when there are no empty spaces and no matching
+// numbers next to each other horizontally or vertically.
+bool game_over(int board[][5], int numrows = 5)
+{
+    for (int r = 0; r < numrows; r++)
+    {
+        for (int c = 0; c < 5; c++)
+        {
+            // Check for an empty space.
+            if (board[r][c] == 0)
+            {
+                return false;
+            }
+
+            // Check the number to the right.
+            if (c < 4 && board[r][c] == board[r][c + 1])
+            {
+                return false;
+            }
+
+            // Check the number below.
+            if (r < numrows - 1 && board[r][c] == board[r + 1][c])
+            {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+// SAVE THE GAME
+bool save_game(int board[][5], int score, int moves, int numrows = 5)
+{
+    ofstream file("savegame.txt"); // Creates a file called savegame.txt.
+    if (!file)
+    {
+        return false;
+    }
+
+    file << score << endl; // Saves the score.
+    file << moves << endl; // Saves the number of moves.
+
+    for (int r = 0; r < numrows; r++)
+    {
+        for (int c = 0; c < 5; c++)
+        {
+            file << board[r][c] << " "; // Saves every number on the board.
+        }
+        file << endl;
+    }
+
+    file.close(); // Closes the file after saving.
+    return !file.fail(); // True means the save completed successfully.
+}
+
+// LOAD THE SAVED GAME
+// ifstream opens a file to read information.
+// saved_score holds the saved score; saved_moves holds the saved move count.
+// saved_board temporarily holds the saved board.
+// return false means something went wrong; true means the game loaded.
+bool load_game(int board[][5], int& score, int& moves, int numrows = 5)
+{
+    ifstream file("savegame.txt");
+    if (!file)
+    {
+        return false;
+    }
+
+    int saved_score;
+    int saved_moves;
+    int saved_board[5][5];
+
+    if (!(file >> saved_score >> saved_moves))
+    {
+        return false;
+    }
+
+    if (saved_score < 0 || saved_moves < 0)
+    {
+        return false;
+    }
+
+    for (int r = 0; r < numrows; r++)
+    {
+        for (int c = 0; c < 5; c++)
+        {
+            if (!(file >> saved_board[r][c]))
+            {
+                return false;
+            }
+
+            int value = saved_board[r][c];
+            // A tile must be zero or a power of two of at least 2.
+            if (value < 0 || (value != 0 && (value < 2 || (value & (value - 1)) != 0)))
+            {
+                return false;
+            }
+        }
+    }
+
+    // Only update the current game after the entire saved game passes validation.
+    score = saved_score;
+    moves = saved_moves;
+    for (int r = 0; r < numrows; r++)
+    {
+        for (int c = 0; c < 5; c++)
+        {
+            board[r][c] = saved_board[r][c];
+        }
+    }
+
+    file.close();
+    return true;
+}
+
+// CREATE THE HELP MENU
+void help_menu()
+{
+    cout << "\n===== HOW TO PLAY 2048 =====" << endl;
+    cout << "U - Move Up" << endl;
+    cout << "D - Move Down" << endl;
+    cout << "L - Move Left" << endl;
+    cout << "R - Move Right" << endl;
+    cout << "N - Start a New Game" << endl;
+    cout << "S - Save Your Game" << endl;
+    cout << "O - Load Your Game" << endl;
+    cout << "H - Show Help" << endl;
+    cout << "E - Exit Game" << endl;
+    cout << "\nCombine matching numbers to reach 2048!" << endl;
+}
+
+#endif // GAME_2048_HELPER_H
