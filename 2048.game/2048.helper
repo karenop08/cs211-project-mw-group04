@@ -1,4 +1,5 @@
 #include <iostream> //allows the program to display text
+#include <fstream> //allows the player to close the game and save their progress
 #include <random> //Provides random number tools.
 #include <iomanip> //Helps format the game board.
 using namespace std; 
@@ -305,19 +306,164 @@ void insert_random(int board[][5], int numrows = 5) // this function adds a new 
 			    return false;
 			}
 
+//detect when the game is over
+//game is over when there are no empty spaces 
+//there are no matching numbers next to each other horizontally or vertically
+
+			bool game_over(int board[][5], int numrows = 5)
+			{
+			    for (int r = 0; r < numrows; r++)
+			    {
+			        for (int c = 0; c < 5; c++)
+			        {
+			            // Check for an empty space.
+			            if (board[r][c] == 0) //if there is an empty space, the game is not over
+			            {
+			                return false;
+			            }
+			
+			            // Check the number to the right.
+			            if (c < 4 && board[r][c] == board[r][c + 1]) // checks whether the number matches the number directly to its right
+						 {											 // if matching numbers exist, they can still continue
+			                return false;							 // if there are no empty and no matching neighbors, the function returns true
+			            }
+			
+			            // Check the number below.
+			            if (r < numrows - 1 &&
+			                board[r][c] == board[r + 1][c]) // checks whether the number matches the number directly below it
+			            {
+			                return false;
+			            }
+			        }
+			    }
+			
+			    return true;
+			}
+
+///////////////SAVE THE GAME//////////////////
+
+bool save_game(int board[][5], int score,
+               int moves, int numrows = 5)
+{
+    ofstream file("savegame.txt");  // creates a file called ("savegame.txt")
+
+    if (!file)
+    {
+        return false;
+    }
+
+    file << score << endl; //saves score
+    file << moves << endl; //saves number of moves
+
+    for (int r = 0; r < numrows; r++)
+    {
+        for (int c = 0; c < 5; c++)
+        {
+            file << board[r][c] << " "; //saves every number on the board
+        }
+
+        file << endl;
+    }
+
+    file.close(); //closes the file after saving
+
+    return true; // the function returns true if the file opened and the save was completed
+}
 
 
+/////////////LOAD THE SAVE GAME/////////////////
 
+	
+//ifstream			Opens a file to read information.
+//saved_score		Holds the saved score.
+//saved_moves		Holds the saved move count.
+//saved_board		Temporarily holds the saved board.
+//file >>			Reads information from the file.
+//return false		Something went wrong.
+//return true		The game loaded successfully.
 
+			bool load_game(int board[][5], int& score,
+			               int& moves, int numrows = 5)
+			{
+			    ifstream file("savegame.txt");
+			
+			    if (!file)
+			    {
+			        return false;
+			    }
+			
+			    int saved_score;
+			    int saved_moves;
+			    int saved_board[5][5];
+			
+			    if (!(file >> saved_score >> saved_moves))
+			    {
+			        return false;
+			    }
+			
+			    if (saved_score < 0 || saved_moves < 0)
+			    {
+			        return false;
+			    }
+			
+			    for (int r = 0; r < numrows; r++)
+			    {
+			        for (int c = 0; c < 5; c++)
+			        {
+			            if (!(file >> saved_board[r][c]))
+			            {
+			                return false;
+			            }
+			
+			            int value = saved_board[r][c];
+			
+			            if (value < 0 ||
+			                (value != 0 && (value & (value - 1)) != 0))
+			            {
+			                return false;
+			            }
+			        }
+			    }
+			
+			    // Only update the current game after
+			    // the entire saved game passes validation.
+			    score = saved_score;
+			    moves = saved_moves;
+			
+			    for (int r = 0; r < numrows; r++)
+			    {
+			        for (int c = 0; c < 5; c++)
+			        {
+			            board[r][c] = saved_board[r][c];
+			        }
+			    }
+			
+			    file.close();
+			
+			    return true;
+			}
+			
+					}
+			
+				}
+			}
 
+///////////////create the help menu/////
 
+void help_menu()
+{
+    cout << "\n===== HOW TO PLAY 2048 =====" << endl;
 
+    cout << "U - Move Up" << endl;
+    cout << "D - Move Down" << endl;
+    cout << "L - Move Left" << endl;
+    cout << "R - Move Right" << endl;
 
+    cout << "N - Start a New Game" << endl;
+    cout << "S - Save Your Game" << endl;
+    cout << "O - Load Your Game" << endl;
+    cout << "H - Show Help" << endl;
+    cout << "E - Exit Game" << endl;
 
-
-
-
-		}
-
-	}
+    cout << "\nCombine matching numbers to reach 2048!" << endl;
 }
