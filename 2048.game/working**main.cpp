@@ -1,5 +1,5 @@
 #include <iostream>
-#include <cstdlib>
+#include <random>
 #include <ctime>
 #include <2048_helper_fixed.h>
 
