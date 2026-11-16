@@ -8,7 +8,7 @@ Programs
 
 - 2048
   
-A terminal version of the classic sliding-tile puzzle 2048, played on a 5x5 board.
+The famous sliding puzzle game in console form which plays on a 5 x 5 square.
 
 - Luhn Algorithm
   
