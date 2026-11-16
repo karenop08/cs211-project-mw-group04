@@ -1,3 +1,5 @@
+# repository URL: 
+https://github.com/karenop08/cs211-project-mw-group04
 # cs211-project-mw-group04
 CS211 Group Project: 2048 & Luhn Checker
 
