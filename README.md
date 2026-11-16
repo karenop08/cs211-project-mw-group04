@@ -39,5 +39,6 @@ Member C: Brayden
 - Prepare final README and test file.
 
 
-Teamwork
+Teamwork:
+
 We will review each other’s code with requests and test the program collectively.
