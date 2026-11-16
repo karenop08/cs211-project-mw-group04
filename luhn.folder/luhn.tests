@@ -1,0 +1,40 @@
+Test #
+Test Input
+Expected Result
+Actual Result
+1
+4532015112830366
+Correct format; checksum passes
+Format OK. Luhn checksum passes.
+2
+4532015112830367
+Correct format; checksum fails
+Format OK. Luhn checksum fails.
+3
+0000000000000018
+Leading zeros preserved; checksum passes
+Format OK. Luhn checksum passes.
+4
+453201511283036
+Reject: 15 digits
+Input format error
+5
+45320151128303666
+Reject: 17 digits
+Input format error
+6
+453201511283036X
+Reject: non-digit character
+Input format error
+7
+Input containing an internal space 
+
+
+Reject: internal spaces
+Input format error
+8
+Several checks followed by exit
+Results correct; program exits cleanly
+Goodbye. (exit code 0)
+
+
