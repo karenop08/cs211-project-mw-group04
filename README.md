@@ -10,10 +10,9 @@ Programs
   
 A terminal version of the classic sliding-tile puzzle 2048, played on a 5x5 board.
 
-- Luhn Validation
+- Luhn Algorithm
   
-A C++ program that takes a 16-digit number and tells the user whether it passes the Luhn checksum.
-
+It is a C++ application that receives a 16 digit number and determines if it passes the Luhn sum.
 
 Team
 
@@ -26,20 +25,19 @@ Team
 Task Plan
 
 Member A: Karen
-- Creates the repository and adds the starter files
-- Invites teammates
-- Adds save/load to 2048
+- Set up the repository and include the files needed.
+- Send invitations to teammates.
+- Add save/load in 2048 game.
 
 Member B: Berfin
-- Writes the left-move logic for 2048
-- Builds Luhn input checking and the checksum
+- Write the logic for 2048 left move.
+- Build input checking function of Luhn and check sum function
 
 Member C: Brayden
-- Adds the right, up, and down moves
-- Implements scoring and game controls
-- Prepares the final README and test notes
+- Complete right, up, down moves in 2048.
+- Work on scoring and control system for the game.
+- Prepare final README and test file.
 
 
 Teamwork
-
-We will review each other's code through requests and test the programs as a team
+We will review each other’s code with requests and test the program collectively.
